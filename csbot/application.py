@@ -2,7 +2,7 @@ from json import loads
 from discord import Client as DiscordClient
 from utils import get_file
 
-config = loads(get_file('../config.json'))
+config = loads(get_file('config.json'))
 client = DiscordClient()
 
 @client.event

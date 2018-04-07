@@ -1,6 +1,9 @@
-import discord
+from json import loads
+from discord import Client as DiscordClient
+from utils import get_file
 
-client = Discord.client()
+secrets = loads(get_file('secrets.json'))
+client = DiscordClient()
 
 @client.event
 async def on_ready():
@@ -9,7 +12,7 @@ async def on_ready():
 @client.event
 async def on_message(message):
     if message.author == client.user: return
-        if message.content.startswith('$hello'):
-            await message.channel.send('Hello!')
+    if message.content.startswith('$hello'):
+        await message.channel.send('Hello!')
 
-client.run('secret')
+client.run(secrets['client-token'])

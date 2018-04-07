@@ -101,7 +101,6 @@ ENV/
 .mypy_cache/
 
 csbot-env/
-run.bat
 config.json
 
 .vscode/*

@@ -2,7 +2,7 @@ from json import loads
 from discord import Client as DiscordClient
 from utils import get_file
 
-secrets = loads(get_file('secrets.json'))
+config = loads(get_file('../config.json'))
 client = DiscordClient()
 
 @client.event
@@ -15,4 +15,4 @@ async def on_message(message):
     if message.content.startswith('$hello'):
         await message.channel.send('Hello!')
 
-client.run(secrets['client-token'])
+client.run(config['client-token'])

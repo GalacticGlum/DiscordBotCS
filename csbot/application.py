@@ -83,6 +83,26 @@ if __name__ == '__main__':
                 conn.close()
 
                 await client.send_message(message.channel, 'Successfully opted into automated notifications!')
+        elif is_command(message, '!show_blacklist'):
+            if message.author.server_permissions.administrator:
+                conn, cursor = db_connect()
+
+                cursor.execute("SELECT * FROM announcement_blacklist")
+                query = cursor.fetchall()
+
+                final_message = '#################'
+
+                if query:
+                    for query_elem in query:
+                        user_id = query_elem[0]
+                        final_message += discord_utils.get(client.get_all_members(), id=user_id).name  + '\n' 
+
+                final_message += '#################'
+
+                conn.commit()
+                conn.close()
+
+                await client.send_file(message.channel, final_message)
 
 client.run(config['token'])
 

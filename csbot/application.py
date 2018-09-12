@@ -54,7 +54,7 @@ async def message_announcement(message):
             embed.add_field(name='Announcement', value=command_less, inline=False)
             await client.send_message(member, embed=embed)
         except:
-            print(f'Couldn\'t send message to {member.name}')
+            print('Couldn\'t send message to {0}'.format(member.name))
 
 @client.event
 async def on_message(message):
@@ -88,8 +88,12 @@ async def console_read_task():
     await client.wait_until_ready()
 
     while not client.is_closed:
-        print('>>> ', end='')
-        message = input()
+        message = str()
+        try:
+            message = input()
+        except:
+            continue
+
         if message.strip() == 'blacklist':
             conn, cursor = db_connect()
 
@@ -109,3 +113,4 @@ async def console_read_task():
 client.loop.create_task(console_read_task())
 
 client.run(config['token'])
+

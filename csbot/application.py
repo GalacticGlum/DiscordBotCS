@@ -90,11 +90,11 @@ async def console_read_task():
     while not client.is_closed:
         message = str()
         try:
-            message = input()
+            message = input().strip()
         except:
             continue
 
-        if message.strip() == 'blacklist':
+        if message == 'blacklist':
             conn, cursor = db_connect()
 
             cursor.execute("SELECT * FROM announcement_blacklist")
@@ -108,6 +108,8 @@ async def console_read_task():
             conn.close()
 
             print('##############\n')
+        elif message == 'exit':
+            exit()
 
 
 client.loop.create_task(console_read_task())

@@ -49,7 +49,7 @@ async def message_announcement(message):
         if has_opted_out_announcement(member): continue
         
         try:
-            embed= Embed(title='Computer Science Club', description='This an automated message. To opt-out, type "!optout"', color=0x0080ff)
+            embed = Embed(title='Computer Science Club', description='This an automated message. To opt-out, type "!optout"', color=0x0080ff)
             embed.set_thumbnail(url='https://i.imgur.com/tEZPnyZ.png')
             embed.add_field(name='Announcement', value=command_less, inline=False)
             await client.send_message(member, embed=embed)
@@ -84,14 +84,28 @@ async def on_message(message):
             await client.send_message(message.channel, 'Successfully opted into automated notifications!')
 
 
-# async def console_read_task():
-#     await client.wait_until_ready()
+async def console_read_task():
+    await client.wait_until_ready()
 
-#     channel = client.get_channel(367469096557871127)
-#     while not client.is_closed():
-#         message = input()
-#         await channel.send(message)
+    while not client.is_closed:
+        print('>>> ', end='')
+        message = input()
+        if message.strip() == 'blacklist':
+            conn, cursor = db_connect()
 
-# client.loop.create_task(console_read_task())
+            cursor.execute("SELECT * FROM announcement_blacklist")
+            query = cursor.fetchall()
+            if query:
+                for query_elem in query:
+                    user_id = query_elem[0]
+                    print(discord_utils.get(client.get_all_members(), id=user_id).name)
+
+            conn.commit()
+            conn.close()
+
+            print('##############\n')
+
+
+client.loop.create_task(console_read_task())
 
 client.run(config['token'])

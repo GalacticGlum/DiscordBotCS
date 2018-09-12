@@ -56,63 +56,33 @@ async def message_announcement(message):
         except:
             print('Couldn\'t send message to {0}'.format(member.name))
 
-@client.event
-async def on_message(message):
-    if message.author == client.user: return
-    if is_command(message, '!announce'):
-        if message.author.server_permissions.administrator:
-            await message_announcement(message)
-    elif is_command(message, '!optout'):  
-        if not has_opted_out_announcement(message.author):
-            conn, cursor = db_connect()
+if __name__ == '__main__':
+    @client.event
+    async def on_message(message):
+        if message.author == client.user: return
+        if is_command(message, '!announce'):
+            if message.author.server_permissions.administrator:
+                await message_announcement(message)
+        elif is_command(message, '!optout'):  
+            if not has_opted_out_announcement(message.author):
+                conn, cursor = db_connect()
 
-            cursor.execute("INSERT INTO announcement_blacklist (id) VALUES (?)", (message.author.id,))
+                cursor.execute("INSERT INTO announcement_blacklist (id) VALUES (?)", (message.author.id,))
 
-            conn.commit()
-            conn.close()
+                conn.commit()
+                conn.close()
 
-            await client.send_message(message.channel, 'Successfully opted-out from automated notifications!')
-    elif is_command(message, '!optin'):
-        if has_opted_out_announcement(message.author):
-            conn, cursor = db_connect()
+                await client.send_message(message.channel, 'Successfully opted-out from automated notifications!')
+        elif is_command(message, '!optin'):
+            if has_opted_out_announcement(message.author):
+                conn, cursor = db_connect()
 
-            cursor.execute("DELETE FROM announcement_blacklist WHERE id=?", (message.author.id,))
-                
-            conn.commit()
-            conn.close()
+                cursor.execute("DELETE FROM announcement_blacklist WHERE id=?", (message.author.id,))
+                    
+                conn.commit()
+                conn.close()
 
-            await client.send_message(message.channel, 'Successfully opted into automated notifications!')
-
-
-# async def console_read_task():
-#     await client.wait_until_ready()
-
-#     while not client.is_closed:
-#         message = str()
-#         try:
-#             message = input().strip()
-#         except:
-#             continue
-
-#         if message == 'blacklist':
-#             conn, cursor = db_connect()
-
-#             cursor.execute("SELECT * FROM announcement_blacklist")
-#             query = cursor.fetchall()
-#             if query:
-#                 for query_elem in query:
-#                     user_id = query_elem[0]
-#                     print(discord_utils.get(client.get_all_members(), id=user_id).name)
-
-#             conn.commit()
-#             conn.close()
-
-#             print('##############\n')
-#         elif message == 'exit':
-#             exit()
-
-
-# client.loop.create_task(console_read_task())
+                await client.send_message(message.channel, 'Successfully opted into automated notifications!')
 
 client.run(config['token'])
 

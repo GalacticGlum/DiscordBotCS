@@ -2,7 +2,7 @@ import os
 import sqlite3
 
 from json import loads
-from discord import Client as DiscordClient, utils as discord_utils
+from discord import Client as DiscordClient, utils as discord_utils, Embed
 from utilities import get_file
 from db_utilities import build_db, connect as db_connect
 
@@ -22,6 +22,12 @@ build_db()
 # async def on_ready():
 #     pass
 
+def is_command(message, command, identifier='!'):
+    if not message.content.startswith(identifier): return False
+
+    parts = message.content.split()
+    if len(parts) == 0: return False
+    return parts[0] == command
 
 def has_opted_out_announcement(user):
     conn, cursor = db_connect()
@@ -34,27 +40,49 @@ def has_opted_out_announcement(user):
     conn.close()
 
 async def message_announcement(message):
-    announce_message = announce_message_format.format(message.author.name, message.content.replace('!announce',  ''))
-    
-    # for member in client.get_all_members():
-    #     client.send_message(member, announce_message)
+    command_less = message.content.replace('!announce',  '')
+    if len(command_less) == 0: return
 
-    if has_opted_out_announcement(discord_utils.get(client.get_all_members(), id='131869972740833280')): return
-    await client.send_message(discord_utils.get(client.get_all_members(), id='131869972740833280'), announce_message)
+    announce_message = announce_message_format.format(message.author.name, command_less)
+
+    for member in client.get_all_members():
+        if has_opted_out_announcement(member): continue
+        
+        try:
+            embed= Embed(title='Computer Science Club', description='This an automated message. To opt-out, type "!optout"', color=0x0080ff)
+            embed.set_thumbnail(url='https://i.imgur.com/tEZPnyZ.png')
+            embed.add_field(name='Announcement', value=command_less, inline=False)
+            await client.send_message(member, embed=embed)
+        except:
+            print(f'Couldn\'t send message to {member.name}')
 
 @client.event
 async def on_message(message):
     if message.author == client.user: return
-    if message.content.split()[0] == '!announce':
-        await message_announcement(message)
-    elif message.content.split()[0] == '!optout':
-        conn, cursor = db_connect()
-        
-        print(message.author.id)
-        cursor.execute("INSERT INTO announcement_blacklist (id) VALUES (?) WHERE NOT EXISTS (SELECT * FROM announcement_blacklist WHERE id=(?))", (message.author.id,))
+    if is_command(message, '!announce'):
+        if message.author.server_permissions.administrator:
+            await message_announcement(message)
+    elif is_command(message, '!optout'):  
+        if not has_opted_out_announcement(message.author):
+            conn, cursor = db_connect()
 
-        conn.commit()
-        conn.close()
+            cursor.execute("INSERT INTO announcement_blacklist (id) VALUES (?)", (message.author.id,))
+
+            conn.commit()
+            conn.close()
+
+            await client.send_message(message.channel, 'Successfully opted-out from automated notifications!')
+    elif is_command(message, '!optin'):
+        if has_opted_out_announcement(message.author):
+            conn, cursor = db_connect()
+
+            cursor.execute("DELETE FROM announcement_blacklist WHERE id=?", (message.author.id,))
+                
+            conn.commit()
+            conn.close()
+
+            await client.send_message(message.channel, 'Successfully opted into automated notifications!')
+
 
 # async def console_read_task():
 #     await client.wait_until_ready()

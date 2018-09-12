@@ -50,7 +50,8 @@ async def on_message(message):
     elif message.content.split()[0] == '!optout':
         conn, cursor = db_connect()
         
-        cursor.execute("INSERT INTO announcement_blacklist (id) VALUES (?)", (message.author.id))
+        print(message.author.id)
+        cursor.execute("INSERT INTO announcement_blacklist (id) VALUES (?) WHERE NOT EXISTS (SELECT * FROM announcement_blacklist WHERE id=(?))", (message.author.id,))
 
         conn.commit()
         conn.close()

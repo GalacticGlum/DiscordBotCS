@@ -1,4 +1,4 @@
 @echo off
 
-call cs-env/scripts/activate.bat
+call csbot-env/scripts/activate.bat
 call python csbot/application.py

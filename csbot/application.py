@@ -84,35 +84,35 @@ async def on_message(message):
             await client.send_message(message.channel, 'Successfully opted into automated notifications!')
 
 
-async def console_read_task():
-    await client.wait_until_ready()
+# async def console_read_task():
+#     await client.wait_until_ready()
 
-    while not client.is_closed:
-        message = str()
-        try:
-            message = input().strip()
-        except:
-            continue
+#     while not client.is_closed:
+#         message = str()
+#         try:
+#             message = input().strip()
+#         except:
+#             continue
 
-        if message == 'blacklist':
-            conn, cursor = db_connect()
+#         if message == 'blacklist':
+#             conn, cursor = db_connect()
 
-            cursor.execute("SELECT * FROM announcement_blacklist")
-            query = cursor.fetchall()
-            if query:
-                for query_elem in query:
-                    user_id = query_elem[0]
-                    print(discord_utils.get(client.get_all_members(), id=user_id).name)
+#             cursor.execute("SELECT * FROM announcement_blacklist")
+#             query = cursor.fetchall()
+#             if query:
+#                 for query_elem in query:
+#                     user_id = query_elem[0]
+#                     print(discord_utils.get(client.get_all_members(), id=user_id).name)
 
-            conn.commit()
-            conn.close()
+#             conn.commit()
+#             conn.close()
 
-            print('##############\n')
-        elif message == 'exit':
-            exit()
+#             print('##############\n')
+#         elif message == 'exit':
+#             exit()
 
 
-client.loop.create_task(console_read_task())
+# client.loop.create_task(console_read_task())
 
 client.run(config['token'])
 

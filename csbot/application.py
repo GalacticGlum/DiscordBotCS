@@ -90,7 +90,7 @@ if __name__ == '__main__':
                 cursor.execute("SELECT * FROM announcement_blacklist")
                 query = cursor.fetchall()
 
-                final_message = '#################'
+                final_message = '#################\n'
 
                 if query:
                     for query_elem in query:

@@ -102,7 +102,9 @@ if __name__ == '__main__':
                 conn.commit()
                 conn.close()
 
-                await client.send_file(message.channel, final_message)
+                await client.send_message(message.channel, final_message)
+        elif is_command(message, '!ping'):
+            await client.send_message(message.channel, 'pong')
 
 client.run(config['token'])
 

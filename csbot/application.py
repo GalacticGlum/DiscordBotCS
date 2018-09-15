@@ -1,5 +1,6 @@
 import os
 import sqlite3
+import re
 
 from json import loads
 from discord import Client as DiscordClient, utils as discord_utils, Embed
@@ -14,13 +15,25 @@ if not os.path.exists(CONFIG_FILE):
 
 config = loads(get_file(CONFIG_FILE))
 announce_message_format = get_file(config['announce_message_format_file'])
+mention_regex_pattern = re.compile('@(\w+)#(\d+)')
 
 client = DiscordClient()
 build_db()
 
-# @client.event
-# async def on_ready():
-#     pass
+def parse_mentions(message):
+    matches = mention_regex_pattern.finditer(message.content)
+    result = message.content
+
+    channel = discord_utils.get(client.get_all_channels(), id=config['general_channel_id'])
+    for match in matches:
+        user = discord_utils.get(channel.server.members, name=match[1], discriminator=match[2])
+        span = match.span()
+
+        result = result[:span[0]] + user.mention + result[span[1]:]
+
+    message.content = result
+    return message
+        
 
 def is_command(message, command, identifier='!'):
     if not message.content.startswith(identifier): return False
@@ -107,7 +120,7 @@ if __name__ == '__main__':
             await client.send_message(message.channel, 'pong')
         elif is_command(message, '!send_as_lane'):
             if message.author.id in config['authorized_users']:
-                message_to_send = message.content.replace('!send_as_lane',  '').strip()
+                message_to_send = parse_mentions(message).content.replace('!send_as_lane',  '').strip()
                 channel = discord_utils.get(client.get_all_channels(), id=config['general_channel_id'])
                 await client.send_message(channel, message_to_send)
 

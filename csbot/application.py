@@ -105,6 +105,12 @@ if __name__ == '__main__':
                 await client.send_message(message.channel, final_message)
         elif is_command(message, '!ping'):
             await client.send_message(message.channel, 'pong')
+        elif is_command(message, '!send_as_lane'):
+            if message.author.id in config['authorized_users']:
+                message_to_send = message.content.replace('!send_as_lane',  '').strip()
+                channel = discord_utils.get(client.get_all_channels(), id=config['general_channel_id'])
+                # await client.send_message(channel, command_less)
+                await client.send_message(message.channel, message_to_send)
 
 client.run(config['token'])
 

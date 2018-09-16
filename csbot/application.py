@@ -27,7 +27,7 @@ def parse_mentions(message):
 
     channel = discord_utils.get(bot.client.get_all_channels(), id=config['general_channel_id'])
     for match in matches:
-        user = discord_utils.get(channel.server.members, name=match[1], discriminator=match[2])
+        user = discord_utils.get(channel.server.members, name=match.group(1), discriminator=match.group(2))
         span = match.span()
 
         result = result[:span[0]] + user.mention + result[span[1]:]

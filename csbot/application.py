@@ -1,6 +1,7 @@
 import os
 import sqlite3
 import re
+import datetime
 
 from json import loads
 from discord import utils as discord_utils, Embed
@@ -112,7 +113,8 @@ async def show_blacklist_command(message, args):
 
 @bot.command('ping')
 async def ping_command(message, args):
-    await bot.client.send_message(message.channel, 'pong')
+    time = int((datetime.datetime.utcnow() - message.timestamp).total_seconds() * 1000)
+    await bot.client.send_message(message.channel, 'pong ``{0} ms``'.format(time))
 
 @bot.command('send_as_lane')
 async def send_as_lane(message, args):

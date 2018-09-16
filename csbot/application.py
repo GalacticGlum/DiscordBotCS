@@ -89,7 +89,7 @@ async def optout_command(message, args):
         await bot.client.send_message(message.channel, 'Successfully opted-out from automated notifications!')
 
 @bot.command('show_blacklist')
-async def show_blacklist_command(mesage, args):
+async def show_blacklist_command(message, args):
     if message.author.server_permissions.administrator:
         conn, cursor = db_connect()
 
